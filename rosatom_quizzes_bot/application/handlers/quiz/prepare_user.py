@@ -22,12 +22,9 @@ logger = logging.getLogger(__name__)
 async def prepare_user_to_quiz_handler(call: CallbackQuery, callback_data: dict):
     logger.debug(f"User {call.from_user.id} enters prepare_user_to_quiz handler")
 
-    direction_name = callback_data["value"]
-    await call.message.edit_text(
-        "Пройди краткий тест об атомной отрасли, набери не менее 7 правильных ответов и получи атомный мерч!",
-        reply_markup=start_quiz_kb(direction_name=direction_name),
-    )
+    await call.message.edit_reply_markup()
 
+    direction_name = callback_data["value"]
     if from_str_name_to_direction(direction_name) == Direction.BASIC:
         await call.message.answer(
             "Росатом - глобальный технологический лидер, обладающий ресурсами и компетенциями для выработки атомной"
@@ -54,3 +51,8 @@ async def prepare_user_to_quiz_handler(call: CallbackQuery, callback_data: dict)
                 ],
             ),
         )
+
+    await call.message.answer(
+        "Пройди краткий тест об атомной отрасли, набери не менее 7 правильных ответов и получи атомный мерч!",
+        reply_markup=start_quiz_kb(direction_name=direction_name),
+    )

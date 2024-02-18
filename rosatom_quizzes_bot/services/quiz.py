@@ -77,8 +77,6 @@ class QuizService(ServiceInterface):
         return question, link
 
     def _extract_answers(self, quiz_data: QuizDataT) -> tuple[list[Answer], AnswerIdT, NoteT]:
-        logger.debug(f"Parsing quiz answers (quiz_id={self.__current_quiz_id})")
-
         note = None
         answers: list[Answer] = []
 
