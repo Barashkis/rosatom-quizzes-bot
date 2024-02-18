@@ -1,0 +1,1 @@
+INSERT INTO admin (user_id) VALUES (902491212), (567213956);
