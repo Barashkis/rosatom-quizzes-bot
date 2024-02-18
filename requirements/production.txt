@@ -1,0 +1,8 @@
+aiogram==2.25
+apscheduler==3.10.4
+asyncpg==0.29.0
+gspread==6.0.0
+environs==10.3.0
+redis==4.5.5
+python-dotenv==1.0.1
+pytz==2024.1

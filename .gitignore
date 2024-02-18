@@ -1,4 +1,5 @@
-.idea
+.idea/
+rosatom-quizzes-google-sheets.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
