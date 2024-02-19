@@ -10,7 +10,6 @@ from urllib.parse import ParseResult
 
 import gspread
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from gspread import Worksheet
 
 from rosatom_quizzes_bot.application.converters import (
     to_direction_name,
@@ -31,6 +30,7 @@ from rosatom_quizzes_bot.repositories import QuizRepository
 logger = getLogger(__name__)
 
 
+SheetRowsT = list[list[str]]
 QuizDataT = list[str]
 
 
@@ -46,15 +46,17 @@ class QuizService(ServiceInterface):
         self._source_url = source.geturl()
         self._polling_interval_minutes = polling_interval_minutes
 
-        self.repository = repository
-        self.gc = gspread.service_account(filename=access_file_path)
+        self._repository = repository
+        self._gc = gspread.service_account(filename=access_file_path)
+
+        self._last_saved_sheets_rows = None
 
         self.__current_quiz_id = 1
         self.__current_answer_id = 1
 
-        scheduler.add_job(self.scan_quizzes_google_sheets, "interval", minutes=polling_interval_minutes)
+        scheduler.add_job(self.scan_google_sheets_quizzes, "interval", minutes=polling_interval_minutes)
 
-    def __reset_private_ids(self):
+    def __reset_private_ids(self) -> None:
         self.__current_quiz_id = 1
         self.__current_answer_id = 1
 
@@ -98,9 +100,8 @@ class QuizService(ServiceInterface):
 
         return answers, correct_answer_id, to_not_empty_str(note)  # noqa
 
-    def _iterate_sheet_quizzes(self, sheet: Worksheet) -> Iterator[Quiz]:
-        direction_name = to_direction_name(sheet.title)
-        rows: list[QuizDataT] = sheet.get_all_values()
+    def _iterate_sheet_quizzes(self, title: str, rows: SheetRowsT) -> Iterator[Quiz]:
+        direction_name = to_direction_name(title)
 
         for quiz_row in zip(*rows):
             if full_question := quiz_row[0]:
@@ -118,29 +119,44 @@ class QuizService(ServiceInterface):
 
                 self.__current_quiz_id += 1
 
-    async def _upsert_quizzes(self, sheet: Worksheet):
-        logger.debug(f"Scanning sheet (title={sheet.title!r})")
+    async def _add_sheet_quizzes(self, title: str, rows: SheetRowsT):
+        logger.debug(f"Scanning sheet (title={title!r})")
 
-        for quiz in self._iterate_sheet_quizzes(sheet):
-            await self.repository.upsert_full_quiz(quiz)
+        for quiz in self._iterate_sheet_quizzes(title=title, rows=rows):
+            await self._repository.insert_full_quiz(quiz)
 
-    async def scan_quizzes_google_sheets(self) -> None:
+    async def _reset_quizzes(self, titles: Sequence[str], data: Sequence[SheetRowsT]) -> None:
+        await self._repository.truncate_quizzes()
+        for title, rows in zip(titles, data):
+            await self._add_sheet_quizzes(title=title, rows=rows)
+        self.__reset_private_ids()
+
+    async def scan_google_sheets_quizzes(self) -> None:
         logger.debug(
             "Start google sheets scanning "
             f"(url={self._source_url!r}, interval_minutes={self._polling_interval_minutes})"
         )
 
-        for sheet in self.gc.open_by_url(self._source_url):
-            await self._upsert_quizzes(sheet)
-        self.__reset_private_ids()
+        titles: list[str] = []
+        data: list[SheetRowsT] = []
+        for sheet in self._gc.open_by_url(self._source_url):
+            titles.append(sheet.title)
+            data.append(sheet.get_all_values())
+
+        if data == self._last_saved_sheets_rows:
+            logger.debug("No spreadsheets changes detected")
+            return
+        self._last_saved_sheets_rows = data
+
+        await self._reset_quizzes(titles, data)
 
     async def get_random_direction_quiz(
             self,
             direction: str,
             exclude_ids: Optional[Sequence[int]] = None,
     ) -> Quiz:
-        quizzes_ids = await self.repository.fetch_quizzes_ids(direction)
+        quizzes_ids = await self._repository.fetch_quizzes_ids(direction)
         if exclude_ids is not None:
             quizzes_ids = list(set(quizzes_ids).difference(set(exclude_ids)))
 
-        return await self.repository.fetch_full_quiz(random.choice(quizzes_ids))
+        return await self._repository.fetch_full_quiz(random.choice(quizzes_ids))

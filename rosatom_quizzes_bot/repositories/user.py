@@ -19,7 +19,7 @@ class UserRepository(PostgresRepositoryInterface):
 
     async def get_admin(self, id_: int) -> Optional[Admin]:
         async with self._pool.acquire() as conn:
-            record = await conn.fetchrow("SELECT * FROM admin WHERE user_id = $1", id_)
+            record = await conn.fetchrow("SELECT * FROM admin WHERE user_id = $1;", id_)
 
         if record is None:
             return None
@@ -29,12 +29,12 @@ class UserRepository(PostgresRepositoryInterface):
     async def get_admins(self) -> AsyncIterator[Admin]:
         async with self._pool.acquire() as conn:
             async with conn.transaction():
-                async for admin in conn.cursor("SELECT user_id FROM admin"):
+                async for admin in conn.cursor("SELECT user_id FROM admin;"):
                     yield Admin(user_id=admin["user_id"])
 
     async def get_user(self, id_: int) -> Optional[User]:
         async with self._pool.acquire() as conn:
-            record = await conn.fetchrow("SELECT username, attempts FROM user_ WHERE user_id = $1", id_)
+            record = await conn.fetchrow("SELECT username, attempts FROM user_ WHERE user_id = $1;", id_)
 
         if record is None:
             return None
@@ -47,11 +47,11 @@ class UserRepository(PostgresRepositoryInterface):
 
     async def add_user(self, user_id: int, username: str) -> None:
         async with self._pool.acquire() as conn:
-            await conn.execute("INSERT INTO user_ (user_id, username) VALUES ($1, $2)", user_id, username)
+            await conn.execute("INSERT INTO user_ (user_id, username) VALUES ($1, $2);", user_id, username)
 
     async def delete_user(self, user_id: int) -> None:
         async with self._pool.acquire() as conn:
-            await conn.execute("DELETE FROM user_ WHERE user_id = $1", user_id)
+            await conn.execute("DELETE FROM user_ WHERE user_id = $1;", user_id)
 
     async def decrease_attempts(self, user_id: int) -> None:
         async with self._pool.acquire() as conn:
