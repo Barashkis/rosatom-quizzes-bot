@@ -8,6 +8,7 @@ class CommonUserCommands(Enum):
 class AdminCommands(Enum):
     START = "Перезапустить бота"
     SET_QUIZZES_SOURCE = "Изменить ссылку на таблицу с вопросами викторины"
+    RESET_USER = "Сбросить состояние (удалить себя из базы данных)"
 
 
 class Direction(Enum):
