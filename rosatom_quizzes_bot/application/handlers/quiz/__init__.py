@@ -83,7 +83,6 @@ async def pass_quiz_handler(poll_answer: types.PollAnswer):
 
     passed_quizzes_count = len(exclude_ids)
     quiz_number = passed_quizzes_count + 1
-    logger.debug(f"User {user_id} enters pass_quiz handler (quiz_number={quiz_number})")
 
     repository = user_repository_context.get(bot)
     user = await repository.get_user(user_id)
@@ -93,6 +92,8 @@ async def pass_quiz_handler(poll_answer: types.PollAnswer):
                 await bot.send_message(user_id, text=basic_quiz_messages[passed_quizzes_count])
 
     if passed_quizzes_count == 10:
+        logger.debug(f"User {user_id} ends quiz")
+
         await repository.decrease_attempts(user_id)
         if (attempts := (user.attempts - 1)) > 0:
             if score < 7:
@@ -124,6 +125,8 @@ async def pass_quiz_handler(poll_answer: types.PollAnswer):
 
         await state.reset_data()
         return
+
+    logger.debug(f"User {user_id} enters pass_quiz handler (quiz_number={quiz_number})")
 
     service = quiz_service_context.get(poll_answer.bot)
     quiz = await service.get_random_direction_quiz(direction=direction_name, exclude_ids=exclude_ids)
