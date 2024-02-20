@@ -1,9 +1,8 @@
 import logging
+import os
 
 from aiogram import types
 from aiogram.dispatcher import FSMContext
-
-from rosatom_quizzes_bot.utils import update_environment_variable
 
 
 logger = logging.getLogger(__name__)
@@ -26,7 +25,7 @@ async def receive_quizzes_source_handler(message: types.Message, state: FSMConte
         logger.info(f"Admin {message.from_user.id} enters invalid quizzes source url (url={quizzes_source!r})")
         return
 
-    update_environment_variable("QUIZZES_SOURCE", quizzes_source)
+    os.environ["QUIZZES_SOURCE"] = quizzes_source
     await message.answer("Ссылка на таблицу была успешно обновлена")
 
     await state.finish()
