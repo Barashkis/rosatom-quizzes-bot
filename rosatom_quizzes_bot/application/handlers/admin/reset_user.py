@@ -14,7 +14,6 @@ async def reset_user_handler(message: types.Message, state: FSMContext):
 
     repository = user_repository_context.get(message.bot)
     await repository.delete_user(user_id)
-    await state.reset_data()
 
     await message.answer(
         "Вы можете снова выбрать роль и проходить тестирование. Для начала процесса воспользуйтесь командой /start",
