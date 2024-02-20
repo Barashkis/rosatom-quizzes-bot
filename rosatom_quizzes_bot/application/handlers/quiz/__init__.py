@@ -36,22 +36,32 @@ logger = getLogger(__name__)
 
 
 async def first_question_handler(call: types.CallbackQuery, state: FSMContext, callback_data: dict):
-    logger.debug(f"User {call.from_user.id} enters first_question handler")
+    user_id = call.from_user.id
+    direction_name = callback_data["direction_name"]
+    logger.debug(f"User {user_id} enters first_question handler (direction={direction_name!r})")
 
     await call.message.edit_reply_markup()
     service = quiz_service_context.get(call.bot)
 
-    direction_name = callback_data["direction_name"]
     quiz = await service.get_random_direction_quiz(direction_name)
     correct_answer_sequence_id = service.correct_answer_sequence_id(quiz)
+
+    question = quiz.question
+    options = [a.text for a in quiz.answers]
+    note = quiz.note
+    logger.debug(
+        f"Sending first poll to user {user_id} "
+        f"(question={question!r}, options={options}, correct_answer_id={correct_answer_sequence_id}, note={note!r})"
+    )
+
     await call.message.answer_poll(
-        question=quiz.question,
-        options=[a.text for a in quiz.answers],
+        question=question,
+        options=options,
         is_anonymous=False,
         type="quiz",
         allows_multiple_answers=False,
         correct_option_id=correct_answer_sequence_id,
-        explanation=quiz.note,
+        explanation=note,
     )
     if (link := quiz.link) is not None:
         await call.message.answer(link)
@@ -92,10 +102,11 @@ async def pass_quiz_handler(poll_answer: types.PollAnswer):
                 await bot.send_message(user_id, text=basic_quiz_messages[passed_quizzes_count])
 
     if passed_quizzes_count == 10:
-        logger.debug(f"User {user_id} ends quiz")
+        attempts = user.attempts - 1
+        logger.debug(f"User {user_id} ends quiz (score={score}, remaining_attempts={attempts})")
 
         await repository.decrease_attempts(user_id)
-        if (attempts := (user.attempts - 1)) > 0:
+        if attempts > 0:
             if score < 7:
                 await bot.send_message(
                     user_id,
@@ -131,15 +142,24 @@ async def pass_quiz_handler(poll_answer: types.PollAnswer):
     service = quiz_service_context.get(poll_answer.bot)
     quiz = await service.get_random_direction_quiz(direction=direction_name, exclude_ids=exclude_ids)
     correct_answer_sequence_id = service.correct_answer_sequence_id(quiz)
+
+    question = quiz.question
+    options = [a.text for a in quiz.answers]
+    note = quiz.note
+    logger.debug(
+        f"Sending poll to user {user_id} "
+        f"(question={question!r}, options={options}, correct_answer_id={correct_answer_sequence_id}, note={note!r})"
+    )
+
     await bot.send_poll(
         user_id,
-        question=quiz.question,
-        options=[a.text for a in quiz.answers],
+        question=question,
+        options=options,
         is_anonymous=False,
         type="quiz",
         allows_multiple_answers=False,
         correct_option_id=correct_answer_sequence_id,
-        explanation=quiz.note,
+        explanation=note,
     )
     if (link := quiz.link) is not None:
         await bot.send_message(user_id, text=link)
