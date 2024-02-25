@@ -10,18 +10,20 @@ from pytz import timezone
 @dataclass
 class PostgresConfig:
     host: str
+    port: int
     password: str
     user: str
     database: str
 
     @property
     def dsn(self) -> str:
-        return f"postgresql://{self.user}:{self.password}@{self.host}:5432/{self.database}"
+        return f"postgresql://{self.user}:{self.password}@{self.host}:{self.port}/{self.database}"
 
 
 @dataclass
 class RedisConfig:
     host: str
+    port: int
     password: str
 
 
@@ -55,12 +57,14 @@ def load_config(path: str = None) -> Config:
         token=env.str("TOKEN"),
         postgres=PostgresConfig(
             host=env.str("POSTGRES_HOST"),
+            port=env.int("POSTGRES_PORT"),
             password=env.str("POSTGRES_PASSWORD"),
             user=env.str("POSTGRES_USER"),
             database=env.str("POSTGRES_DATABASE"),
         ),
         redis=RedisConfig(
             host=env.str("REDIS_HOST"),
+            port=env.int("REDIS_PORT"),
             password=env.str("REDIS_PASSWORD"),
         ),
         logger=LoggerConfig(

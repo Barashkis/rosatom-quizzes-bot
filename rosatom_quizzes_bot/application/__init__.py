@@ -12,9 +12,10 @@ from rosatom_quizzes_bot.config import Config
 
 def build_dispatcher(config: Config) -> Dispatcher:
     storage = RedisStorage2(
-        host=config.redis.host,
-        password=config.redis.password,
-    ) if config.redis else MemoryStorage()
+        host=redis_config.host,
+        port=redis_config.port,
+        password=redis_config.password,
+    ) if (redis_config := config.redis) else MemoryStorage()
     bot = Bot(token=config.token, parse_mode=ParseMode.HTML)
     dp = Dispatcher(bot=bot, storage=storage)
 

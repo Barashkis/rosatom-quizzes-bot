@@ -49,6 +49,10 @@ class UserRepository(PostgresRepositoryInterface):
         async with self._pool.acquire() as conn:
             await conn.execute("INSERT INTO user_ (user_id, username) VALUES ($1, $2);", user_id, username)
 
+    async def add_admin(self, admin_id: int) -> None:
+        async with self._pool.acquire() as conn:
+            await conn.execute("INSERT INTO admin (user_id) VALUES ($1);", admin_id)
+
     async def delete_user(self, user_id: int) -> None:
         async with self._pool.acquire() as conn:
             await conn.execute("DELETE FROM user_ WHERE user_id = $1;", user_id)
