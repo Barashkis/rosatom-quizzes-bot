@@ -88,7 +88,11 @@ async def pass_quiz_handler(poll_answer: types.PollAnswer):
         exclude_ids = data["exclude_ids"]
 
         if data["correct_answer_id"] in poll_answer.option_ids:
+            logger.debug(f"User {user_id} answers last quiz correctly")
             data["score"] += 1
+        else:
+            logger.debug(f"User {user_id} gives wrong answer to last quiz")
+
         score = data["score"]
 
     passed_quizzes_count = len(exclude_ids)
