@@ -69,7 +69,7 @@ class QuizService(ServiceInterface):
 
     @staticmethod
     def _extract_question_data(full_question_text: str) -> tuple[QuestionT, LinkT]:
-        if (question_info := re.match(r"(.+)\s\((.*)\)", full_question_text)) is not None:
+        if (question_info := re.match(r"^(.+)\s\((.*)\)$", full_question_text)) is not None:
             groups = question_info.groups()
             question = groups[0]
             link = to_not_empty_str(groups[1])
@@ -85,7 +85,7 @@ class QuizService(ServiceInterface):
         raw_answers = quiz_data[1:]
         for answer_text in raw_answers:
             if answer_text:
-                if right_answer_data := re.match(r"(.+)\s\((\+)[;\s]?(.*)\)", answer_text):
+                if right_answer_data := re.match(r"^(.+)\s\((\+)[;\s]?(.*)\)$", answer_text):
                     answer_text, _, note = right_answer_data.groups()
                     correct_answer_id = self.__current_answer_id
 
@@ -132,11 +132,6 @@ class QuizService(ServiceInterface):
         self.__reset_private_ids()
 
     async def scan_google_sheets_quizzes(self) -> None:
-        logger.debug(
-            "Start google sheets scanning "
-            f"(url={self._source_url!r}, interval_minutes={self._polling_interval_minutes})"
-        )
-
         titles: list[str] = []
         data: list[SheetRowsT] = []
         for sheet in self._gc.open_by_url(self._source_url):
@@ -144,9 +139,13 @@ class QuizService(ServiceInterface):
             data.append(sheet.get_all_values())
 
         if data == self._last_saved_sheets_rows:
-            logger.debug("No spreadsheets changes detected")
             return
         self._last_saved_sheets_rows = data
+
+        logger.debug(
+            "Detected changes in the spreadsheets, resetting data "
+            f"(url={self._source_url!r}, interval_minutes={self._polling_interval_minutes})"
+        )
 
         await self._reset_quizzes(titles, data)
 
