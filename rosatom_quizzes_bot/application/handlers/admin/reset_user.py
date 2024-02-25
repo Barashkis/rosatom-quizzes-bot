@@ -1,14 +1,14 @@
 import logging
 
 from aiogram import types
-from aiogram.dispatcher import FSMContext
 
 from rosatom_quizzes_bot.application.context import user_repository_context
+
 
 logger = logging.getLogger(__name__)
 
 
-async def reset_user_handler(message: types.Message, state: FSMContext):
+async def reset_user_handler(message: types.Message):
     user_id = message.from_user.id
     logger.debug(f"Admin {user_id} enters reset_user handler")
 
