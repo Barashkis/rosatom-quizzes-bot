@@ -16,6 +16,6 @@ __all__ = (
 
 
 def setup_admin_routes(dp: Dispatcher) -> None:
-    dp.register_message_handler(reset_user_handler, Command("reset_user"))
+    dp.register_message_handler(reset_user_handler, AdminFilter(), Command("reset_user"))
     dp.register_message_handler(set_quizzes_source_handler, AdminFilter(), Command("set_quizzes_source"))
     dp.register_message_handler(receive_quizzes_source_handler, state="send_quizzes_source")
