@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 async def reset_user_handler(message: types.Message):
     user_id = message.from_user.id
-    logger.debug(f"Admin {user_id} enters reset_user handler")
+    logger.debug(f"User {user_id} enters reset_user handler")
 
     repository = user_repository_context.get(message.bot)
     await repository.delete_user(user_id)
