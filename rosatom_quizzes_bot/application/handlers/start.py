@@ -4,15 +4,20 @@ from aiogram import (
     Dispatcher,
     types,
 )
-from aiogram.dispatcher.filters import CommandStart
+from aiogram.dispatcher.filters import (
+    CommandStart,
+    Command,
+)
 from aiogram.utils.markdown import hbold
 
 from rosatom_quizzes_bot.application.context import user_repository_context
+from rosatom_quizzes_bot.application.handlers.admin import reset_user_handler
 from rosatom_quizzes_bot.application.keyboards import (
     choose_direction_cd,
     directions_kb,
     start_kb,
 )
+
 from rosatom_quizzes_bot.application.utils import setup_admin_commands
 
 
@@ -56,4 +61,5 @@ async def choose_direction_handler(call: types.CallbackQuery):
 
 def setup_start_routes(dp: Dispatcher) -> None:
     dp.register_message_handler(start_handler, CommandStart())
+    dp.register_message_handler(reset_user_handler, Command("reset_user"))
     dp.register_callback_query_handler(choose_direction_handler, choose_direction_cd.filter())

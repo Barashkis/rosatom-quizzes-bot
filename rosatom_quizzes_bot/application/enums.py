@@ -3,6 +3,7 @@ from enum import Enum
 
 class CommonUserCommands(Enum):
     START = "Перезапустить бота"
+    RESET_USER = "Сбросить состояние (применять в случае, если бот завис)"
 
 
 class AdminCommands(Enum):

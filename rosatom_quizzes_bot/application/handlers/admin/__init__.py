@@ -27,7 +27,6 @@ __all__ = (
 
 
 def setup_admin_routes(dp: Dispatcher) -> None:
-    dp.register_message_handler(reset_user_handler, AdminFilter(), Command("reset_user"))
     dp.register_message_handler(request_admin_id_handler, AdminFilter(), Command("add_admin"))
     dp.register_message_handler(show_user_id_handler, Command("id"))
 
