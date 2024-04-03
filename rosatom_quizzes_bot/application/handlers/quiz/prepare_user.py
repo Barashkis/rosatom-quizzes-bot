@@ -53,6 +53,7 @@ async def prepare_user_to_quiz_handler(call: CallbackQuery, callback_data: dict)
         )
 
     await call.message.answer(
-        "Пройди краткий тест об атомной отрасли, набери не менее 7 правильных ответов и получи атомный мерч!",
+        "Пройди краткий тест об атомной отрасли, набери не менее 7 правильных ответов и получи атомный мерч!"
+        "У тебя есть три попытки на его прохождение",
         reply_markup=start_quiz_kb(direction_name=direction_name),
     )

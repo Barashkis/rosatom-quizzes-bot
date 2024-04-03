@@ -40,6 +40,7 @@ async def add_admin_handler(message: types.Message, state: FSMContext) -> None:
 
     admin = await repository.get_admin(new_admin_id)
     if admin is not None:
+        logger.info(f"Admin {message.from_user.id} tries to add existing admin (admin_id={admin.user_id})")
         await message.answer(
             "Вы пытаетесь добавить администратора, который уже им является. "
             "Повторите попытку или напишите 'Назад', чтобы отменить процесс добавления администратора",

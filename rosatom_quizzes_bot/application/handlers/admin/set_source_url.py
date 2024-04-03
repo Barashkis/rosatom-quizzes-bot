@@ -20,9 +20,8 @@ async def receive_quizzes_source_handler(message: types.Message, state: FSMConte
 
     quizzes_source = message.text
     if "https://docs.google.com/spreadsheets/d/" not in quizzes_source:
-        await message.answer("Отправленное вами сообщение не является ссылкой. Повторите попытку еще раз")
-
         logger.info(f"Admin {message.from_user.id} enters invalid quizzes source url (url={quizzes_source!r})")
+        await message.answer("Отправленное вами сообщение не является ссылкой. Повторите попытку еще раз")
         return
 
     os.environ["QUIZZES_SOURCE"] = quizzes_source

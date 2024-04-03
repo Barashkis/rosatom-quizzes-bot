@@ -1,23 +1,13 @@
 import logging
 
-from aiogram import (
-    Dispatcher,
-    types,
-)
-from aiogram.dispatcher.filters import (
-    CommandStart,
-    Command,
-)
+from aiogram import types
 from aiogram.utils.markdown import hbold
 
 from rosatom_quizzes_bot.application.context import user_repository_context
-from rosatom_quizzes_bot.application.handlers.admin import reset_user_handler
 from rosatom_quizzes_bot.application.keyboards import (
-    choose_direction_cd,
     directions_kb,
     start_kb,
 )
-
 from rosatom_quizzes_bot.application.utils import setup_admin_commands
 
 
@@ -25,7 +15,8 @@ logger = logging.getLogger(__name__)
 
 
 __all__ = (
-    "setup_start_routes",
+    "choose_direction_handler",
+    "start_handler",
 )
 
 
@@ -41,7 +32,9 @@ async def start_handler(message: types.Message):
     if user is not None:
         await message.answer(
             "Похоже, ты уже запускал бота ранее, так что ты уже можешь приступать к прохождению теста.\n\n"
-            "Важно: у тебя всего три попытки на прохождение!",
+            "Важно: у тебя всего три попытки на прохождение!\n\n"
+            "Если ты не можешь приступить к прохождению теста или его продолжению из-за того, что переписка с ботом "
+            "удалена либо бот перестал тебе отвечать, воспользуйся командой /restore_quiz",
         )
         return
 
@@ -57,9 +50,3 @@ async def choose_direction_handler(call: types.CallbackQuery):
     logger.debug(f"User {call.from_user.id} enters choose_direction handler")
 
     await call.message.edit_text("Отлично! Выбери свое направление", reply_markup=directions_kb)
-
-
-def setup_start_routes(dp: Dispatcher) -> None:
-    dp.register_message_handler(start_handler, CommandStart())
-    dp.register_message_handler(reset_user_handler, Command("reset_user"))
-    dp.register_callback_query_handler(choose_direction_handler, choose_direction_cd.filter())
