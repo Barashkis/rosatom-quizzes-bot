@@ -1,20 +1,22 @@
 import logging
 
-from aiogram import types
+from aiogram import (
+    Dispatcher,
+    types,
+)
 from aiogram.dispatcher import FSMContext
+from aiogram.dispatcher.filters import Command
 
 from rosatom_quizzes_bot.application.context import user_repository_context
+from rosatom_quizzes_bot.application.filters import (
+    AdminFilter,
+    AdminIdMessageFilter,
+    BackMessageFilter,
+)
 from rosatom_quizzes_bot.application.utils import setup_admin_commands
 
 
 logger = logging.getLogger(__name__)
-
-
-async def show_user_id_handler(message: types.Message):
-    user_id = message.from_user.id
-    logger.debug(f"User {user_id} enters show_user_id_handler")
-
-    await message.answer(user_id)
 
 
 async def request_admin_id_handler(message: types.Message, state: FSMContext):
@@ -30,7 +32,7 @@ async def request_admin_id_handler(message: types.Message, state: FSMContext):
     await state.set_state("send_new_admin_id")
 
 
-async def add_admin_handler(message: types.Message, state: FSMContext) -> None:
+async def add_admin_handler(message: types.Message, state: FSMContext):
     user_id = message.from_user.id
     new_admin_id = message.forward_from.id if message.is_forward() else int(message.text)
     logger.debug(f"Admin {user_id} enters add_admin_handler (new_admin_id={new_admin_id!r})")
@@ -67,3 +69,10 @@ async def cancel_adding_admin_handler(message: types.Message, state: FSMContext)
 
     await state.finish()
     await message.answer("Вы вернулись в главное меню и можете использоваться все команды")
+
+
+def setup_add_admin_routes(dp: Dispatcher) -> None:
+    dp.register_message_handler(request_admin_id_handler, AdminFilter(), Command("add_admin"))
+    dp.register_message_handler(add_admin_handler, AdminIdMessageFilter(), state="send_new_admin_id")
+    dp.register_message_handler(cancel_adding_admin_handler, BackMessageFilter(), state="send_new_admin_id")
+    dp.register_message_handler(wrong_admin_id_handler, state="send_new_admin_id")

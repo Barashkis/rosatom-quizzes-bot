@@ -1,8 +1,14 @@
 import logging
 import os
 
-from aiogram import types
+from aiogram import (
+    Dispatcher,
+    types,
+)
 from aiogram.dispatcher import FSMContext
+from aiogram.dispatcher.filters import Command
+
+from rosatom_quizzes_bot.application.filters import AdminFilter
 
 
 logger = logging.getLogger(__name__)
@@ -28,3 +34,8 @@ async def receive_quizzes_source_handler(message: types.Message, state: FSMConte
     await message.answer("Ссылка на таблицу была успешно обновлена")
 
     await state.finish()
+
+
+def setup_source_url_routes(dp: Dispatcher) -> None:
+    dp.register_message_handler(set_quizzes_source_handler, AdminFilter(), Command("set_quizzes_source"))
+    dp.register_message_handler(receive_quizzes_source_handler, state="send_quizzes_source")

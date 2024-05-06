@@ -16,11 +16,6 @@ from rosatom_quizzes_bot.application.keyboards import start_kb
 logger = logging.getLogger(__name__)
 
 
-__all__ = (
-    "restore_quiz_handler",
-)
-
-
 async def restore_quiz_handler(message: types.Message, state: FSMContext):
     user_id = message.from_user.id
     logger.debug(f"User {user_id} enters restore_quiz handler")
