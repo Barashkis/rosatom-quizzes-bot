@@ -19,7 +19,7 @@ from rosatom_quizzes_bot.application.utils import setup_admin_commands
 logger = logging.getLogger(__name__)
 
 
-async def request_admin_id_handler(message: types.Message, state: FSMContext):
+async def request_admin_id_handler(message: types.Message, state: FSMContext) -> None:
     logger.debug(f"Admin {message.from_user.id} enters request_admin_id_handler")
 
     await message.answer(
@@ -32,7 +32,7 @@ async def request_admin_id_handler(message: types.Message, state: FSMContext):
     await state.set_state("send_new_admin_id")
 
 
-async def add_admin_handler(message: types.Message, state: FSMContext):
+async def add_admin_handler(message: types.Message, state: FSMContext) -> None:
     user_id = message.from_user.id
     new_admin_id = message.forward_from.id if message.is_forward() else int(message.text)
     logger.debug(f"Admin {user_id} enters add_admin_handler (new_admin_id={new_admin_id!r})")

@@ -36,7 +36,7 @@ from rosatom_quizzes_bot.data import basic_quiz_messages
 logger = getLogger(__name__)
 
 
-async def first_question_handler(call: types.CallbackQuery, state: FSMContext, callback_data: dict):
+async def first_question_handler(call: types.CallbackQuery, state: FSMContext, callback_data: dict) -> None:
     user_id = call.from_user.id
 
     bot = call.bot
@@ -100,7 +100,7 @@ async def first_question_handler(call: types.CallbackQuery, state: FSMContext, c
         data["quizzes_mapping_ids"] = {obj.poll.id: quiz.id}
 
 
-async def pass_quiz_handler(poll_answer: types.PollAnswer):
+async def pass_quiz_handler(poll_answer: types.PollAnswer) -> None:
     user_id = poll_answer.user.id
     poll_id = poll_answer.poll_id
 

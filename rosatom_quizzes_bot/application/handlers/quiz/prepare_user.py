@@ -19,7 +19,7 @@ from rosatom_quizzes_bot.application.keyboards import start_quiz_kb
 logger = logging.getLogger(__name__)
 
 
-async def prepare_user_to_quiz_handler(call: CallbackQuery, callback_data: dict):
+async def prepare_user_to_quiz_handler(call: CallbackQuery, callback_data: dict) -> None:
     logger.debug(f"User {call.from_user.id} enters prepare_user_to_quiz handler")
 
     await call.message.edit_reply_markup()

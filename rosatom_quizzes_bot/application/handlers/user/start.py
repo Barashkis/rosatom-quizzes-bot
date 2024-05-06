@@ -19,7 +19,7 @@ from rosatom_quizzes_bot.application.utils import setup_admin_commands
 logger = logging.getLogger(__name__)
 
 
-async def start_handler(message: types.Message):
+async def start_handler(message: types.Message) -> None:
     user_id = message.from_user.id
     logger.debug(f"User {user_id} enters start handler")
 
@@ -45,7 +45,7 @@ async def start_handler(message: types.Message):
     )
 
 
-async def choose_direction_handler(call: types.CallbackQuery):
+async def choose_direction_handler(call: types.CallbackQuery) -> None:
     logger.debug(f"User {call.from_user.id} enters choose_direction handler")
 
     await call.message.edit_text("Отлично! Выбери свое направление", reply_markup=directions_kb)
