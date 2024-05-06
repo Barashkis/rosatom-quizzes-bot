@@ -27,10 +27,15 @@ async def request_user_to_reset_handler(message: types.Message, state: FSMContex
 
 async def reset_user_handler(message: types.Message, state: FSMContext) -> None:
     user_id = message.from_user.id
-    user_to_reset_id = int(message.text)
+    user_to_reset_id = message.text
     bot = message.bot
     logger.debug(f"Admin {user_id} enters reset_user handler (user_to_reset_id={user_to_reset_id})")
 
+    if not user_to_reset_id.isdigit():
+        await message.answer("Вы ввели неправильный идентификатор пользователя. Повторите попытку еще раз")
+        return
+
+    user_to_reset_id = int(user_to_reset_id)
     repository = user_repository_context.get(message.bot)
     user_to_reset = await repository.get_user(user_to_reset_id)
     if user_to_reset is None:
