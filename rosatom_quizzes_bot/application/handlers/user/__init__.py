@@ -14,5 +14,5 @@ __all__ = (
 def setup_user_routes(dp: Dispatcher) -> None:
     setup_start_routes(dp)
 
-    dp.register_message_handler(restore_quiz_handler, Command("restore_quiz"))
     dp.register_message_handler(show_user_id_handler, Command("id"), state="*")
+    dp.register_message_handler(restore_quiz_handler, Command("restore_quiz"))

@@ -8,6 +8,7 @@ from rosatom_quizzes_bot.application.handlers import (
 
 
 def setup_routes(dp: Dispatcher) -> None:
-    setup_admin_routes(dp)
     setup_user_routes(dp)
     setup_quiz_routes(dp)
+
+    setup_admin_routes(dp)
