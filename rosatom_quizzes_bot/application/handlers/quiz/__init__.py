@@ -53,7 +53,7 @@ async def first_question_handler(call: types.CallbackQuery, state: FSMContext, c
         logger.debug(f"User {user_id} enters first_question handler with no attempts (direction={direction_name!r})")
         await call.message.answer(
             "К сожалению, ты потратил все свои три попытки... Но, если ты набрал в одном из тестов "
-            "7 баллов или более, ты можешь показать этот результат на стенде Росатома и получить атомный мерч!",
+            "6 баллов или более, ты можешь показать этот результат на стенде Росатома и получить атомный мерч!",
         )
         return
 
@@ -120,7 +120,7 @@ async def pass_quiz_handler(poll_answer: types.PollAnswer) -> None:
         await bot.send_message(
             user_id,
             text="К сожалению, ты потратил все свои три попытки... Но, если ты набрал в одном из тестов "
-                 "7 баллов или более, ты можешь показать этот результат на стенде Росатома и получить атомный мерч!",
+                 "6 баллов или более, ты можешь показать этот результат на стенде Росатома и получить атомный мерч!",
         )
         return
 
