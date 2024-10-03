@@ -168,12 +168,12 @@ async def pass_quiz_handler(poll_answer: types.PollAnswer) -> None:
             if passed_quizzes_count in basic_quiz_messages:
                 await bot.send_message(user_id, text=basic_quiz_messages[passed_quizzes_count])
 
-    if question_number == 10:
+    if question_number == 8:
         attempts = user.attempts - 1
         logger.debug(f"User {user_id} ends quiz (score={score}, remaining_attempts={attempts})")
 
         await repository.decrease_attempts(user_id)
-        if score >= 7:
+        if score >= 6:
             await bot.send_message(
                 user_id,
                 text=f"Твой результат: {score} баллов. "
